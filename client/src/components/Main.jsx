@@ -8,6 +8,7 @@ import { useStateProvider } from "@/context/StateContext";
 import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
 import { reducerCases } from "@/context/constants";
 import axios from "axios";
+import Chat from "./Chat/Chat";
 
 function Main() {
   const router = useRouter();
@@ -51,7 +52,8 @@ function Main() {
     <>
       <div className="grid w-screen h-screen max-w-full max-h-screen overflow-hidden grid-cols-main">
         <ChatList />
-        <Empty />
+        {/* <Empty /> */}
+        <Chat />
       </div>
     </>
   );
