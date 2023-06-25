@@ -13,6 +13,7 @@ function ContactsList() {
     const getContacts = async () => {
       try {
         const { data: { users } } = await axios.get(GET_ALL_CONTACTS);
+        setAllContacts(users);
       } catch (error) {
         console.log("🚀 ~ file: ContactsList.jsx:13 ~ useEffect ~ error:", error)
       }
@@ -49,7 +50,7 @@ function ContactsList() {
                 </div>
                 {
                   userList.map(contact => {
-                    return(
+                    return (
                       <ChatLIstItem data={contact} isContactPage={true} key={contact.id} />
                     )
                   })

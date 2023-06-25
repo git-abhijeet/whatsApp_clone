@@ -78,7 +78,7 @@ export const getAllUsers = async (req, res, next) => {
             }
             usersGroupByInitialLetter[initialLetter].push(user);
         });
-        return res.send(200).send({ users: usersGroupByInitialLetter });
+        return res.status(200).send({ users: usersGroupByInitialLetter });
     } catch (error) {
         next(error)
     }
