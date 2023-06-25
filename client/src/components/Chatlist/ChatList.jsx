@@ -1,16 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SearchBar from "./SearchBar";
 import List from "./List";
 import ChatListHeader from "./ChatListHeader";
+import { useStateProvider } from "@/context/StateContext";
+import ContactsList from "./ContactsList";
 
 function ChatList() {
+  const [{ contactsPage }] = useStateProvider();
+  const [pageType, setPageType] = useState("default");
+
+  useEffect(() => {
+    if (contactsPage) {
+      setPageType("all-contacts");
+    } else {
+      setPageType("default");
+    }
+  }, [contactsPage]);
+
   return (
     <div className="z-20 flex flex-col max-h-screen bg-panel-header-background">
-      <>
-        <ChatListHeader />
-        <SearchBar />
-        <List />
-      </>
+      {
+        pageType === "default" && (
+          <>
+            <ChatListHeader />
+            <SearchBar />
+            <List />
+          </>
+        )
+      }
+      {
+        pageType === "all-contacts" && <ContactsList />
+      }
     </div>
   );
 }
