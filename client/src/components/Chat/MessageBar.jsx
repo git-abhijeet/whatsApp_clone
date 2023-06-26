@@ -1,6 +1,6 @@
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
-import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
+import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import React, { useEffect, useRef, useState } from "react";
@@ -8,12 +8,47 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { FaMicrophone } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
+import PhotoPicker from "../common/PhotoPicker";
 
 function MessageBar() {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
   const [message, setMessage] = useState("")
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
+  const [grabPhoto, setGrabPhoto] = useState(false);
+
+  const photoPickerChange = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+      const response = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        params: {
+          from: userInfo.id,
+          to: currentChatUser.id,
+        },
+      });
+      if (response.status === 201) {
+        socket.current.emit("send-msg", {
+          to: currentChatUser?.id,
+          from: userInfo?.id,
+          message: response.data.message,
+        });
+        dispatch({
+          type: reducerCases.ADD_MESSAGE,
+          newMessage: {
+            ...response.data.message,
+          },
+          fromSelf: true,
+        });
+      }
+    } catch (error) {
+      console.log("🚀 ~ file: MessageBar.jsx:25 ~ photoPickerChange ~ error:", error)
+    }
+  };
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -62,6 +97,18 @@ function MessageBar() {
     }
   }
 
+  useEffect(() => {
+    if (grabPhoto) {
+      const data = document.getElementById("photo-picker");
+      data.click();
+      document.body.onfocus = (e) => {
+        setTimeout(() => {
+          setGrabPhoto(false);
+        }, 1000)
+      }
+    }
+  }, [grabPhoto])
+
   return (
     <div className="relative flex items-center h-20 gap-6 px-4 bg-panel-header-background">
       <>
@@ -74,7 +121,7 @@ function MessageBar() {
               </div>
             )
           }
-          <ImAttachment className="text-xl cursor-pointer text-panel-header-icon" title="Attach File" />
+          <ImAttachment className="text-xl cursor-pointer text-panel-header-icon" title="Attach File" onClick={() => setGrabPhoto(true)} />
         </div>
         <div className="flex items-center w-full h-10 rounded-lg">
           <input type="text" placeholder="Type a message" className="w-full h-10 px-5 py-4 text-sm text-white rounded-lg bg-input-background focus:outline-none" onChange={(e) => setMessage(e.target.value)} value={message} />
@@ -86,6 +133,7 @@ function MessageBar() {
           </button>
         </div>
       </>
+      {grabPhoto && (<PhotoPicker onChange={photoPickerChange} />)}
     </div>
   );
 }
