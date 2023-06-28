@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChatList from "./Chatlist/ChatList";
 import Empty from "./Empty";
 import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import { useRouter } from "next/router";
 import { useStateProvider } from "@/context/StateContext";
-import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
+import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import { reducerCases } from "@/context/constants";
 import axios from "axios";
 import Chat from "./Chat/Chat";
+import { io } from "socket.io-client";
+import SearchMessages from "./Chat/SearchMessages";
 
 function Main() {
   const router = useRouter();
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] = useStateProvider();
   const [redirectLogin, setRedirectLogin] = useState(false);
+  const [socketEvent, setSocketEvent] = useState(false);
+  const socket = useRef();
 
   useEffect(() => {
     if (redirectLogin) {
@@ -48,13 +52,50 @@ function Main() {
     }
   })
 
+  useEffect(() => {
+    if (userInfo) {
+      socket.current = io(HOST);
+      socket.current.emit("add-user", userInfo.id);
+      dispatch({ type: reducerCases.SET_SOCKET, socket });
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (socket.current && !socketEvent) {
+      socket.current.on("msg-receive", (data) => {
+        dispatch({
+          type: reducerCases.ADD_MESSAGE,
+          newMessage: {
+            ...data.message,
+          },
+        });
+      });
+      setSocketEvent(true);
+    }
+  }, [socket.current]);
+
+  useEffect(() => {
+    const getMessages = async () => {
+      const { data: { messages } } = await axios.get(`${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`);
+      dispatch({ type: reducerCases.SET_MESSAGES, messages });
+    }
+    if (currentChatUser?.id) {
+      getMessages();
+    }
+  }, [currentChatUser]);
+
   return (
     <>
       <div className="grid w-screen h-screen max-w-full max-h-screen overflow-hidden grid-cols-main">
         <ChatList />
-        {
-          currentChatUser ? <Chat /> : <Empty />
-        }
+        {currentChatUser ? (
+          <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
+            <Chat />
+            {messagesSearch && <SearchMessages />}
+          </div>
+        ) : (
+          <Empty />
+        )}
       </div>
     </>
   );
