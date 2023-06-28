@@ -4,6 +4,9 @@ const nextConfig = {
   images: {
     domains: ["localhost"],
   },
+  // experiments: {
+  //   topLevelAwait: true,
+  // },
 };
 
 module.exports = nextConfig;
