@@ -10,10 +10,11 @@ import { reducerCases } from "@/context/constants";
 import axios from "axios";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
+import SearchMessages from "./Chat/SearchMessages";
 
 function Main() {
   const router = useRouter();
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] = useStateProvider();
   const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
   const socket = useRef();
@@ -87,9 +88,14 @@ function Main() {
     <>
       <div className="grid w-screen h-screen max-w-full max-h-screen overflow-hidden grid-cols-main">
         <ChatList />
-        {
-          currentChatUser ? <Chat /> : <Empty />
-        }
+        {currentChatUser ? (
+          <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
+            <Chat />
+            {messagesSearch && <SearchMessages />}
+          </div>
+        ) : (
+          <Empty />
+        )}
       </div>
     </>
   );
