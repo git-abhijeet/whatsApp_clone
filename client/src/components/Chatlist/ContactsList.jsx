@@ -8,12 +8,30 @@ import ChatLIstItem from "./ChatLIstItem";
 
 function ContactsList() {
   const [allContacts, setAllContacts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchContacts, setSearchContacts] = useState("");
   const [{ }, dispatch] = useStateProvider();
+
+  useEffect(() => {
+    if (searchTerm.length) {
+      const filteredData = {};
+      Object.keys(allContacts).forEach((key) => {
+        filteredData[key] = allContacts[key].filter((obj) =>
+          obj.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+      setSearchContacts(filteredData);
+    } else {
+      setSearchContacts(allContacts);
+    }
+  }, [searchTerm]);
+
   useEffect(() => {
     const getContacts = async () => {
       try {
         const { data: { users } } = await axios.get(GET_ALL_CONTACTS);
         setAllContacts(users);
+        setSearchContacts(users);
       } catch (error) {
         console.log("🚀 ~ file: ContactsList.jsx:13 ~ useEffect ~ error:", error)
       }
@@ -37,13 +55,13 @@ function ContactsList() {
               <BiSearchAlt2 className="cursor-pointer text-l text-panel-header-icon" />
             </div>
             <div>
-              <input type="text" placeholder="Search Contacts" className="w-full text-sm text-white bg-transparent focus:outline-none" />
+              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search Contacts" className="w-full text-sm text-white bg-transparent focus:outline-none" />
             </div>
           </div>
         </div>
         {
-          Object.entries(allContacts).map(([initialLetter, userList]) => {
-            return (
+          Object.entries(searchContacts).map(([initialLetter, userList]) => {
+            return (userList.length > 0 &&
               <div key={Date.now() + initialLetter}>
                 <div className="py-5 pl-10 text-teal-light">
                   {initialLetter}
