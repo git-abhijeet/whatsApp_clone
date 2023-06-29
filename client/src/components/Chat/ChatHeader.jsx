@@ -9,7 +9,7 @@ import { reducerCases } from "@/context/constants";
 import ContextMenu from "../common/ContextMenu";
 
 function ChatHeader() {
-  const [{ currentChatUser }, dispatch] = useStateProvider();
+  const [{ currentChatUser, onlineUsers }, dispatch] = useStateProvider();
 
   const [contextMenuCoordinates, setContextMenuCoordinates] = useState({
     x: 0,
@@ -65,7 +65,7 @@ function ChatHeader() {
             {currentChatUser?.name}
           </span>
           <span className="text-sm text-secondary">
-            Online/Offline
+            {onlineUsers.includes(currentChatUser.id) ? "Online" : "Offline"}
           </span>
         </div>
       </div>
