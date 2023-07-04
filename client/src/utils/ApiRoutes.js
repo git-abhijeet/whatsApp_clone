@@ -1,4 +1,5 @@
-export const HOST = "http://localhost:5000";
+// export const HOST = "http://localhost:5000";
+export const HOST = "https://whatsapp-clone-mxmo.onrender.com";
 
 const AUTH_ROUTE = `${HOST}/api/auth`;
 const MESSAGES_ROUTE = `${HOST}/api/messages`;

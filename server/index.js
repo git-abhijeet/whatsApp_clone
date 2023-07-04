@@ -11,8 +11,8 @@ const app = express()
 app.use(cors());
 app.use(express.json());
 
-app.get("/",(req,res) => {
-    res.send({message: "Welcome to backend"});
+app.get("/", (req, res) => {
+    res.send({ message: "Welcome to backend" });
 })
 
 app.use("/uploads/recordings", express.static("uploads/recordings"));
@@ -28,7 +28,8 @@ const server = app.listen(process.env.PORT, () => {
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        // origin: "http://localhost:3000",
+        origin: process.env.FRONTEND,
     },
 });
 

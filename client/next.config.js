@@ -6,7 +6,8 @@ const nextConfig = {
     NEXT_PUBLIC_ZEGO_SERVER_ID: "1fe289afb13fc9c45ab26e8d16f0fd35",
   },
   images: {
-    domains: ["localhost"],
+    // domains: ["localhost"],
+    domains: ['whatsapp-clone-mxmo.onrender.com'],
   },
   // experiments: {
   //   topLevelAwait: true,

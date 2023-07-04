@@ -26,7 +26,6 @@ function login() {
     try {
       if (email) {
         const { data } = await axios.post(CHECK_USER_ROUTE, { email });
-        console.log("🚀 ~ file: login.jsx:17 ~ handleLogin ~ {data}:", { data })
         if (!data.status) {
           dispatch({ type: reducerCases.SET_NEW_USER, newUser: true });
           dispatch({
@@ -57,7 +56,6 @@ function login() {
     } catch (error) {
       console.log("🚀 ~ file: login.jsx:15 ~ handleLogin ~ error:", error)
     }
-    // console.log("🚀 ~ file: login.jsx:12 ~ handleLogin ~ { user }:", { user })
   }
 
   return (
