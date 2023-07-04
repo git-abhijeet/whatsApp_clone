@@ -11,6 +11,10 @@ const app = express()
 app.use(cors());
 app.use(express.json());
 
+app.get("/",(req,res) => {
+    res.send({message: "Welcome to backend"});
+})
+
 app.use("/uploads/recordings", express.static("uploads/recordings"));
 app.use("/uploads/images", express.static("uploads/images"));
 
